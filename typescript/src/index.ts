@@ -71,10 +71,10 @@ const writeMessagesToTextFile = async (
 			// remove hyperlink message
 			.filter((v) => !options?.containLink && !v.text.match(/<([^<>|]*)(?:\|([^<>]*))?>/g))
 			.map((v) => v.text)
-			.join('<EOT>'),
+			.join('<|endoftext|>'),
 	);
 };
 
 const messages = await getMessages();
 
-await writeMessagesToTextFile('./messages.txt', messages);
+await writeMessagesToTextFile('./dataset.txt', messages);
