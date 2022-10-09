@@ -57,24 +57,48 @@ const getMessages = async (): Promise<Array<MessageBody>> => {
 const writeMessagesToTextFile = async (
 	fileName: string,
 	messages: Array<MessageBody>,
-	options?: {
-		containLink?: false;
+	options: {
+		eotSuffix?: string;
+		containLink?: boolean;
+		additionalCondition?: (v: MessageBody) => boolean;
 	},
 ) => {
+	const { eotSuffix, containLink, additionalCondition } = options;
+	const _eotSuffix = eotSuffix ? eotSuffix : '<|endoftext|>';
+	const _containLink = containLink ? containLink : false;
+
 	await Deno.writeTextFile(
 		fileName,
 		messages
-			// specify a user
-			.filter((v) => v.user === userResponse.user.id)
-			// remove like the message 'Someone join this channel'.
-			.filter((v) => typeof v.subtype === 'undefined')
-			// remove hyperlink message
-			.filter((v) => !options?.containLink && !v.text.match(/<([^<>|]*)(?:\|([^<>]*))?>/g))
-			.map((v) => v.text)
-			.join('<|endoftext|>'),
+			.filter((v) =>
+				// specify a user
+				v.user === userResponse.user.id &&
+				// remove like the message 'Someone join this channel'.
+				typeof v.subtype === 'undefined' &&
+				// other condition
+				(
+					// remove hyperlink message
+					(!_containLink && !v.text.match(/<([^<>|]*)(?:\|([^<>]*))?>/g)) &&
+					// additional condition
+					(additionalCondition ? additionalCondition(v) : true)
+				)
+			)
+			.map((v, index, array) => {
+				if (index === array.length - 1) {
+					console.log(`Filtered ${array.length} messages.`);
+				}
+				return v.text;
+			})
+			.join(_eotSuffix),
 	);
 };
 
 const messages = await getMessages();
 
-await writeMessagesToTextFile('./dataset.txt', messages);
+await writeMessagesToTextFile(
+	'./dataset.txt',
+	messages,
+	{
+		additionalCondition: (v) => !v.text.includes(':terra:'),
+	},
+);
