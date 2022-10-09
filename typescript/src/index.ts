@@ -15,13 +15,14 @@ const userResponse: UserResponse = await web.apiCall('users.lookupByEmail', {
 	email: USER_MAIL,
 });
 
-const getMessage = async (): Promise<Array<MessageBody>> => {
+const getMessages = async (): Promise<Array<MessageBody>> => {
 	console.log('Start get messages...');
 
 	return await new Promise((resolve, reject) => {
 		const msg: Array<MessageBody> = [];
+		let count = 0;
 
-		const recursiveGetMessage = async (cursor?: string) => {
+		const recursiveGetMessages = (cursor?: string) => {
 			// require below permissions
 			// channels:history, groups:history, im:history, mpim:history
 			web.apiCall('conversations.history', {
@@ -29,14 +30,17 @@ const getMessage = async (): Promise<Array<MessageBody>> => {
 				cursor,
 			})
 				.then((res: MessageResponse) => {
+					const { messages, response_metadata: { next_cursor } } = res;
 					// push message
-					msg.push(...res.messages);
+					msg.push(...messages);
+					// iterate count
+					count += messages.length;
 					// if next message exist
-					if (res.response_metadata.next_cursor) {
+					if (next_cursor) {
 						// iterate next message
-						recursiveGetMessage(res.response_metadata.next_cursor);
+						recursiveGetMessages(next_cursor);
 					} else {
-						console.log('End get messages.');
+						console.log(`End get ${count} messages.`);
 						resolve(msg);
 					}
 				})
@@ -46,21 +50,31 @@ const getMessage = async (): Promise<Array<MessageBody>> => {
 				});
 		};
 
-		recursiveGetMessage();
+		recursiveGetMessages();
 	});
 };
 
-const messages = await getMessage();
+const writeMessagesToTextFile = async (
+	fileName: string,
+	messages: Array<MessageBody>,
+	options?: {
+		containLink?: false;
+	},
+) => {
+	await Deno.writeTextFile(
+		fileName,
+		messages
+			// specify a user
+			.filter((v) => v.user === userResponse.user.id)
+			// remove like the message 'Someone join this channel'.
+			.filter((v) => typeof v.subtype === 'undefined')
+			// remove hyperlink message
+			.filter((v) => !options?.containLink && !v.text.match(/<([^<>|]*)(?:\|([^<>]*))?>/g))
+			.map((v) => v.text)
+			.join('<EOT>'),
+	);
+};
 
-await Deno.writeTextFile(
-	'./messages.txt',
-	messages
-		// specify a user
-		.filter((v) => v.user === userResponse.user.id)
-		// remove like the message 'Someone join this channel'.
-		.filter((v) => typeof v.subtype === 'undefined')
-		// remove hyperlink message
-		.filter((v) => !v.text.match(/<([^<>|]*)(?:\|([^<>]*))?>/g))
-		.map((v) => v.text)
-		.join('<EOT>\n'),
-);
+const messages = await getMessages();
+
+await writeMessagesToTextFile('./messages.txt', messages);
