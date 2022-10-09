@@ -6,6 +6,7 @@ const { SLACK_CHANNEL_ID, SLACK_TOKEN, USER_MAIL } = await loadEnv({
 	export: true,
 	allowEmptyValues: true,
 });
+const SLACK_CHANNEL_IDS = SLACK_CHANNEL_ID.split(';');
 
 const web = new WebClient(SLACK_TOKEN);
 
@@ -15,43 +16,47 @@ const userResponse: UserResponse = await web.apiCall('users.lookupByEmail', {
 	email: USER_MAIL,
 });
 
-const getMessages = async (): Promise<Array<MessageBody>> => {
+const getMessagesByChannels = async (channels = SLACK_CHANNEL_IDS): Promise<Array<Array<MessageBody>>> => {
 	console.log('Start get messages...');
 
-	return await new Promise((resolve, reject) => {
-		const msg: Array<MessageBody> = [];
-		let count = 0;
+	return (await Promise.all(channels.map(
+		async (channel) => {
+			return await new Promise((resolve, reject) => {
+				const msg: Array<MessageBody> = [];
+				let count = 0;
 
-		const recursiveGetMessages = (cursor?: string) => {
-			// require below permissions
-			// channels:history, groups:history, im:history, mpim:history
-			web.apiCall('conversations.history', {
-				channel: SLACK_CHANNEL_ID,
-				cursor,
-			})
-				.then((res: MessageResponse) => {
-					const { messages, response_metadata: { next_cursor } } = res;
-					// push message
-					msg.push(...messages);
-					// iterate count
-					count += messages.length;
-					// if next message exist
-					if (next_cursor) {
-						// iterate next message
-						recursiveGetMessages(next_cursor);
-					} else {
-						console.log(`End get ${count} messages.`);
-						resolve(msg);
-					}
-				})
-				.catch((err) => {
-					console.log(err);
-					reject(err);
-				});
-		};
+				const recursiveGetMessages = (cursor?: string) => {
+					// require below permissions
+					// channels:history, groups:history, im:history, mpim:history
+					web.apiCall('conversations.history', {
+						channel,
+						cursor,
+					})
+						.then((res: MessageResponse) => {
+							const { messages, response_metadata: { next_cursor } } = res;
+							// push message
+							msg.push(...messages);
+							// iterate count
+							count += messages.length;
+							// if next message exist
+							if (next_cursor) {
+								// iterate next message
+								recursiveGetMessages(next_cursor);
+							} else {
+								console.log(`End get ${count} messages in channel ID:${channel}.`);
+								resolve(msg);
+							}
+						})
+						.catch((err) => {
+							console.log(err);
+							reject(err);
+						});
+				};
 
-		recursiveGetMessages();
-	});
+				recursiveGetMessages();
+			});
+		},
+	)));
 };
 
 const writeMessagesToTextFile = async (
@@ -93,11 +98,11 @@ const writeMessagesToTextFile = async (
 	);
 };
 
-const messages = await getMessages();
+const messages = await getMessagesByChannels();
 
 await writeMessagesToTextFile(
 	'./dataset.txt',
-	messages,
+	messages.flat(),
 	{
 		additionalCondition: (v) => !v.text.includes(':terra:'),
 	},
