@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 .env
-typescript/*.txt
+typescript/scraper/**/*.txt
 .docker/opt/gpt2-japanese
