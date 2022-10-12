@@ -1,11 +1,16 @@
+## On local development
 1. install gpt2-japanese  
 `cd .docker/opt && git clone https://github.com/tanreinama/gpt2-japanese`
-2. build docker && start
+2. build docker && start dev server
 `docker-compose build`
 `docker-compose up`
+`docker exec slack-gpt-bot-sample flask run --host 0.0.0.0 --port 3000`
+3. check sample text
+`curl http://localhost:3000/generate-text`
 
-### check sample
-`docker-compose exec slack-gpt-bot-sample bash`
-`cd opt/gpt2-japanese`
-#### generate 5 sample
-`python gpt2-generate.py --model ./checkpoint/gpr2ja-finetune_run1-small --num_generate 5`
+## CI/CD
+1. Cloud Build
+`gcloud builds submit --project slack-gpt-bot-sample --tag gcr.io/slack-gpt-bot-sample/generate-text`
+
+2. Depoly Cloud Run
+`gcloud run deploy --project slack-gpt-bot-sample --image gcr.io/slack-gpt-bot-sample/generate-text --max-instances=1 --cpu 2 --memory=5Gi`

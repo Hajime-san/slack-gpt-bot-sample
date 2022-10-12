@@ -10,6 +10,5 @@ services:
       - ./opt:/root/opt
     ports:
       - "3000:3000"
-    command: flask run --host 0.0.0.0 --port 3000
     environment:
       - FLASK_APP=opt/web/app.py
