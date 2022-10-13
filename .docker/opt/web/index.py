@@ -1,8 +1,9 @@
 import os
 import subprocess
-from flask import Flask
+from flask import Flask, jsonify
 
 app = Flask(__name__)
+app.config["JSON_AS_ASCII"] = False
 
 @app.route('/')
 def index():
@@ -21,7 +22,7 @@ def generate_text():
             # stdout=subprocess.PIPE,
             cwd=r"./opt/gpt2-japanese"
         )
-    return ret.stdout
+    return jsonify({"text":ret.stdout})
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
