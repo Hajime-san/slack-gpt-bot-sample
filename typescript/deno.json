@@ -6,7 +6,8 @@
 	"lint": {
 		"files": {
 			"include": [
-				"src"
+				"scraper",
+				"scheduler-bot"
 			],
 			"exclude": ["node_modules"]
 		},
@@ -24,7 +25,8 @@
 	"fmt": {
 		"files": {
 			"include": [
-				"src",
+				"scraper",
+				"scheduler-bot",
 				"deno.json"
 			],
 			"exclude": ["node_modules"]

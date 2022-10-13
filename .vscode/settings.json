@@ -1,9 +1,15 @@
 {
-    "deno.enable": true,
-    "deno.lint": true,
-    "deno.config": "./typescript/deno.json",
-    "[typescript]": {
-      "editor.formatOnSave": true,
-      "editor.defaultFormatter": "denoland.vscode-deno"
-    }
+  "deno.enable": true,
+  "deno.lint": true,
+  "deno.unstable": true,
+  "deno.config": "./typescript/deno.json",
+  "deno.suggest.imports.hosts": {
+    "https://deno.land": false
+  },
+  "deno.importMap": "typescript/scheduler-bot/import_map.json",
+  "[typescript]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "editor.tabSize": 2
 }
