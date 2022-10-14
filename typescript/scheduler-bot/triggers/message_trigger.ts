@@ -18,7 +18,6 @@ const trigger: Trigger<typeof MessageWorkflow.definition> = {
 		frequency: {
 			type: 'weekly',
 			on_days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-			repeats_every: 30,
 		},
 	},
 };
