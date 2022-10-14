@@ -5,10 +5,10 @@ import MessageFunction from './message_function.ts';
 const { createContext } = SlackFunctionTester('message_function');
 
 Deno.test('Message function test', async () => {
-	const inputs = { message: 'Welcome to the team!' };
-	const { outputs } = await MessageFunction(createContext({ inputs }));
-	assertEquals(
-		Object.is(outputs?.message, undefined),
-		true,
-	);
+  const inputs = { message: 'Welcome to the team!' };
+  const { outputs } = await MessageFunction(createContext({ inputs }));
+  assertEquals(
+    Object.is(outputs?.message, undefined),
+    true,
+  );
 });

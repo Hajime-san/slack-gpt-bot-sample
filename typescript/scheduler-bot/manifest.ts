@@ -7,9 +7,9 @@ import MessageWorkflow from './workflows/message_workflow.ts';
  * https://api.slack.com/future/manifest
  */
 export default Manifest({
-	name: 'scheduler-bot',
-	description: 'A sample GPT text generator with scheduled bot',
-	icon: 'assets/icon.png',
-	workflows: [MessageWorkflow],
-	botScopes: ['channels:read', 'chat:write', 'chat:write.public'],
+  name: 'scheduler-bot',
+  description: 'A sample GPT text generator with scheduled bot',
+  icon: 'assets/icon.png',
+  workflows: [MessageWorkflow],
+  botScopes: ['channels:read', 'chat:write', 'chat:write.public'],
 });

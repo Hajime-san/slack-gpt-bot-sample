@@ -7,9 +7,9 @@ import { MessageFunctionDefinition } from '../functions/message_function.ts';
  * https://api.slack.com/future/workflows
  */
 const MessageWorkflow = DefineWorkflow({
-	callback_id: 'message_workflow',
-	title: 'Message Workflow',
-	description: 'Send a message to a channel',
+  callback_id: 'message_workflow',
+  title: 'Message Workflow',
+  description: 'Send a message to a channel',
 });
 
 MessageWorkflow.addStep(MessageFunctionDefinition, {});

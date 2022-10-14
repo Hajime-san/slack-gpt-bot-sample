@@ -9,17 +9,17 @@ import { datetime } from 'https://deno.land/x/ptera@v1.0.2/mod.ts';
  * https://api.slack.com/future/triggers
  */
 const trigger: Trigger<typeof MessageWorkflow.definition> = {
-	name: 'Send a message',
-	type: 'scheduled',
-	workflow: '#/workflows/message_workflow',
-	schedule: {
-		// UTC now to ISO string
-		start_time: datetime().add({ minute: 1 }).toUTC().toISO(),
-		frequency: {
-			type: 'weekly',
-			on_days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-		},
-	},
+  name: 'Send a message',
+  type: 'scheduled',
+  workflow: '#/workflows/message_workflow',
+  schedule: {
+    // UTC now to ISO string
+    start_time: datetime().add({ minute: 1 }).toUTC().toISO(),
+    frequency: {
+      type: 'weekly',
+      on_days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    },
+  },
 };
 
 export default trigger;
