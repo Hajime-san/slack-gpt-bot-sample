@@ -1,5 +1,6 @@
 import { DefineFunction, Schema, SlackFunction } from 'deno-slack-sdk/mod.ts';
 import { SlackAPI } from 'deno-slack-api/mod.ts';
+import { API_URL, SLACK_CHANNEL_ID } from '../env.ts';
 
 /**
  * Functions are reusable building blocks of automation that accept
@@ -18,9 +19,12 @@ export default SlackFunction(
 	MessageFunctionDefinition,
 	async ({ token }) => {
 		const client = SlackAPI(token, {});
+		// fetch generate text
+		const response = await fetch(`${API_URL}/generate-text`);
+		const { text }: { text: string } = await response.json();
 		await client.chat.postMessage({
-			channel: 'C01CK0S5H8A',
-			text: 'hi',
+			channel: SLACK_CHANNEL_ID,
+			text,
 		});
 		return { outputs: {} };
 	},
