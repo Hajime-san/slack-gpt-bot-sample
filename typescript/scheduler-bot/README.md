@@ -26,4 +26,15 @@ To use this sample, you first need to install and configure the Slack CLI. Step-
 
 ## Create a Link Trigger
 
-slack trigger create --trigger-def "triggers/message_trigger.ts"
+`slack trigger create --trigger-def "triggers/message_trigger.ts"`
+
+## Local development
+
+`slack run`\
+And you will get a error like,\
+`🚫  Error: write tcp 000.00.000.000:00000->0.000.000.00:000: write: broken pipe`\
+because API needs about 100 seconds to respond.
+
+## Deploy
+
+`slack deploy`
